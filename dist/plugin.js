@@ -1,4 +1,4 @@
-exports.version = 1
+exports.version = 1.01
 exports.description = "Ban IPs after too many requests in a short time. Counting is reset on restart."
 exports.apiRequired = 4
 exports.repo = "rejetto/antidos"
@@ -6,6 +6,9 @@ exports.repo = "rejetto/antidos"
 exports.config = {
     max: { type: 'number', min: 0, defaultValue: 200, helperText: "Max number of requests" },
     seconds: { type: 'number', min: 1, defaultValue: 10, helperText: "Time window for request counting" },
+}
+exports.configDialog = {
+    sx: { maxWidth: '20em' },
 }
 
 exports.init = api => {
