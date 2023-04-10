@@ -1,4 +1,4 @@
-exports.version = 1.01
+exports.version = 1.02
 exports.description = "Ban IPs after too many requests in a short time. Counting is reset on restart."
 exports.apiRequired = 4
 exports.repo = "rejetto/antidos"
@@ -35,8 +35,10 @@ exports.init = api => {
         },
         async middleware(ctx) {
             const { ip } = ctx
-            if (ban.has(ip))
-                return ctx.socket.end()
+            if (ban.has(ip)) {
+                ctx.socket.end()
+                return true
+            }
             let a = reqsByIp.get(ip)
             if (!a)
                 reqsByIp.set(ip, a = [])
