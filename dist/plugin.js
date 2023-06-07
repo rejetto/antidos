@@ -1,5 +1,5 @@
-exports.version = 1.02
-exports.description = "Ban IPs after too many requests in a short time. Counting is reset on restart."
+exports.version = 1.03
+exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
 exports.apiRequired = 4
 exports.repo = "rejetto/antidos"
 
@@ -12,6 +12,7 @@ exports.configDialog = {
 }
 
 exports.init = api => {
+    const { isLocalHost } = api.require('./misc')
 
     const reqsByIp = new Map()
     const ban = new Set()
@@ -39,6 +40,7 @@ exports.init = api => {
                 ctx.socket.end()
                 return true
             }
+            if (isLocalHost(ctx)) return
             let a = reqsByIp.get(ip)
             if (!a)
                 reqsByIp.set(ip, a = [])
