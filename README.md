@@ -7,4 +7,4 @@ Install it from Admin-panel > Plugins > Search online .
 
 These are the options:
 
-<img width="903" alt="image" src="https://user-images.githubusercontent.com/1367199/229456945-d3074e09-47a9-473f-a70b-779c4fc3cc72.png">
+<img width="355" alt="image" src="https://github.com/rejetto/antidos/assets/1367199/ebe66d50-ff97-486b-a509-86a951020135">
