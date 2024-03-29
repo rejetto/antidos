@@ -1,11 +1,11 @@
-exports.version = 2
+exports.version = 2.1
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
 exports.apiRequired = 4
 exports.repo = "rejetto/antidos"
 
 exports.config = {
-    max: { type: 'number', min: 0, defaultValue: 200, helperText: "Max number of requests" },
-    seconds: { type: 'number', min: 1, defaultValue: 10, xs: 6, label: "Time window", unit: "seconds", helperText: "Limit in time" },
+    max: { type: 'number', min: 0, defaultValue: 500, helperText: "Max number of requests" },
+    seconds: { type: 'number', min: 1, defaultValue: 5, xs: 6, label: "Time window", unit: "seconds", helperText: "Limit in time" },
     howLong: { type: 'number', min: 0, defaultValue: 0, xs: 6, unit: "seconds", helperText: "0 = infinite" },
     whitelist: { type: 'string', multiline: true, helperText: "one ip per line" }
 }
