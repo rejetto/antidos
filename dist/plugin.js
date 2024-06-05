@@ -1,6 +1,6 @@
-exports.version = 2.1
+exports.version = 2.2
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
-exports.apiRequired = 4
+exports.apiRequired = 8.85
 exports.repo = "rejetto/antidos"
 
 exports.config = {
