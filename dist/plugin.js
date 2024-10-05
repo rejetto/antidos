@@ -1,4 +1,4 @@
-exports.version = 2.2
+exports.version = 2.31
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
 exports.apiRequired = 8.85
 exports.repo = "rejetto/antidos"
@@ -7,19 +7,20 @@ exports.config = {
     max: { type: 'number', min: 0, defaultValue: 500, helperText: "Max number of requests" },
     seconds: { type: 'number', min: 1, defaultValue: 5, xs: 6, label: "Time window", unit: "seconds", helperText: "Limit in time" },
     howLong: { type: 'number', min: 0, defaultValue: 0, xs: 6, unit: "seconds", helperText: "0 = infinite" },
-    whitelist: { type: 'string', multiline: true, helperText: "one ip per line" }
+    whitelist: { type: 'string', multiline: true, helperText: "one ip per line; masks are supported" }
 }
 exports.configDialog = {
     sx: { maxWidth: '20em' },
 }
 
 exports.init = api => {
-    const { isLocalHost } = api.require('./misc')
+    const { isLocalHost, makeNetMatcher } = api.require('./misc')
 
     const reqsByIp = new Map()
     const ban = new Set()
-    let whitelist = []
-    api.subscribeConfig('whitelist', v => whitelist = (v||'').split('\n').map(x => x.trim())) // keep it updated
+    let isWhiteListed
+    api.subscribeConfig('whitelist', v => // keep it updated
+        isWhiteListed = makeNetMatcher((v||'').split('\n').map(x => `(${x.trim()})`).join('|')) )
 
     const timer = setInterval(() => {
         const now = Date.now() - api.getConfig('seconds') * 1000
@@ -40,7 +41,7 @@ exports.init = api => {
         },
         async middleware(ctx) {
             const { ip } = ctx
-            if (whitelist.includes(ip)) return
+            if (isWhiteListed(ip)) return
             if (ban.has(ip)) {
                 ctx.socket.end()
                 return true
