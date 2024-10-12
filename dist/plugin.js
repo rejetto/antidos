@@ -1,6 +1,6 @@
-exports.version = 2.32
+exports.version = 3
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
-exports.apiRequired = 8.891
+exports.apiRequired = 9.5 // newSocket
 exports.repo = "rejetto/antidos"
 
 exports.config = {
@@ -35,32 +35,42 @@ exports.init = api => {
         }
     }, 1000)
 
+    api.events.on('newSocket', ({ ip }) => {
+        if (isLocalHost(ip)) return
+        if (isBanned(ip))
+            return api.events.preventDefault
+    })
+
     return {
         unload() {
             clearInterval(timer)
         },
         async middleware(ctx) {
-            const { ip } = ctx
-            if (isWhiteListed(ip)) return
-            if (ban.has(ip)) {
-                ctx.socket.end()
-                return ctx.stop()
-            }
+            if (!api.getHfsConfig('proxies')) return // only with proxies the ip may be different from the one provided by the Socket
             if (isLocalHost(ctx)) return
-            let a = reqsByIp.get(ip)
-            if (!a)
-                reqsByIp.set(ip, a = [])
-            a.push(Date.now())
-            if (a.length <= api.getConfig('max')) return
-            api.log("banning " + ip)
-            ban.add(ip)
-            reqsByIp.delete(ip)
-            const long = api.getConfig('howLong') * 1000
-            if (!long) return
-            setTimeout(() => {
-                ban.delete(ip)
-                api.log("ban lifted " + ip)
-            }, long)
+            if (!isBanned(ctx.ip)) return
+            ctx.socket.destroy()
+            return ctx.stop()
         }
+    }
+
+    function isBanned(ip) {
+        if (isWhiteListed(ip)) return
+        if (ban.has(ip))
+            return true
+        let a = reqsByIp.get(ip)
+        if (!a)
+            reqsByIp.set(ip, a = [])
+        a.push(Date.now())
+        if (a.length <= api.getConfig('max')) return
+        api.log("banning " + ip)
+        ban.add(ip)
+        reqsByIp.delete(ip)
+        const ms = api.getConfig('howLong') * 1000
+        if (ms) setTimeout(() => {
+            ban.delete(ip)
+            api.log("ban lifted " + ip)
+        }, ms)
+        return true
     }
 }
