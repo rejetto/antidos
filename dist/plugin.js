@@ -1,6 +1,6 @@
-exports.version = 2.31
+exports.version = 2.32
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
-exports.apiRequired = 8.85
+exports.apiRequired = 8.891
 exports.repo = "rejetto/antidos"
 
 exports.config = {
@@ -44,7 +44,7 @@ exports.init = api => {
             if (isWhiteListed(ip)) return
             if (ban.has(ip)) {
                 ctx.socket.end()
-                return true
+                return ctx.stop()
             }
             if (isLocalHost(ctx)) return
             let a = reqsByIp.get(ip)
