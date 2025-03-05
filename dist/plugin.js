@@ -1,4 +1,4 @@
-exports.version = 4
+exports.version = 4.1
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
 exports.apiRequired = 9.5 // newSocket
 exports.repo = "rejetto/antidos"
@@ -39,7 +39,7 @@ exports.init = api => {
     // early disconnection
     const cancelEvent = api.events.on('newSocket', ({ ip }) => {
         if (isBanned(ip))
-            return api.events.preventDefault
+            return api.Const.API_VERSION < 12 ? api.events.preventDefault : 'antidos' // in newer version we can specify a message
     })
 
     return {
