@@ -1,4 +1,4 @@
-exports.version = 4.1
+exports.version = 4.2
 exports.description = "Ban IPs after too many requests in a short time. No persistence on restart."
 exports.apiRequired = 9.5 // newSocket
 exports.repo = "rejetto/antidos"
@@ -13,6 +13,9 @@ exports.config = {
 exports.configDialog = {
     sx: { maxWidth: '20em' },
 }
+exports.changelog = [
+    { "version": 4.2, "message": "Compatibility with future HFS versions" }
+]
 
 exports.init = api => {
     const { isLocalHost, makeNetMatcher } = api.require('./misc')
@@ -39,7 +42,7 @@ exports.init = api => {
     // early disconnection
     const cancelEvent = api.events.on('newSocket', ({ ip }) => {
         if (isBanned(ip))
-            return api.Const.API_VERSION < 12 ? api.events.preventDefault : 'antidos' // in newer version we can specify a message
+            return api.Const.API_VERSION < 12 ? api.events.stop : 'antidos' // in newer versions we can specify a message
     })
 
     return {
